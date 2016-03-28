@@ -117,7 +117,8 @@ Custom property | Description | Default
     <paper-menu-button id="menu" vertical-align="[[verticalAlign]]" horizontal-align="[[horizontalAlign]]">
       <paper-icon-button
           id="iconButton"
-          icon="swatch:format-color-fill"
+          icon="[[_icon]]"
+          src="[[src]]"
           class="dropdown-trigger" alt="color picker"
           noink$="[[noink]]">
       </paper-icon-button>
@@ -127,6 +128,7 @@ Custom property | Description | Default
         </template>
       </paper-listbox>
     </paper-menu-button>
+    <div id="pickerLabel">[[label]]</div>
   </template>
 
   <script>
@@ -208,6 +210,42 @@ Custom property | Description | Default
          */
         noink: {
           type: Boolean
+        },
+
+        /**
+         * The URL of an image for the icon. If the src property is specified,
+         * the icon property should not be, and the image for the icon
+         * never changes its color according to selected color.
+         */
+        src: {
+          type: String
+        },
+
+        /**
+         * Specifies the icon name or index in the set of icons available in
+         * the icon's icon set. If the icon property is specified,
+         * the src property should not be. If the icon and src properties are not specified,
+         * icon will be set as defaultIcon.
+         */
+        icon: {
+          type: String
+        },
+
+        /**
+         * Specifies the label text draw with paper-swatch-picker.
+         */
+        label: {
+          type: String
+        },       
+
+        /**
+         * Specifies the selected color paints the label or not. If the src property is specified,
+         * the image for the icon never changes its color according to selected color.
+         */
+        colorLabel: {
+          type: Boolean,
+          value: false,
+          observer: '_colorLabelChanged'
         }
       },
 
@@ -266,6 +304,23 @@ Custom property | Description | Default
 
       _colorChanged: function() {
         this.$.iconButton.style.color = this.color;
+        this._colorLabelChanged();
+      },
+
+      _colorLabelChanged: function() {
+        if (this.colorLabel) {
+          this.$.pickerLabel.style.color = this.color;
+        }
+        else {
+          this.$.pickerLabel.style.color = null;
+        }
+      },
+
+      _getIcon: function() {
+        if (!this.src && !this.icon)
+          return 'swatch:format-color-fill';
+
+        return this.icon;
       },
 
       /**
